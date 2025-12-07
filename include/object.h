@@ -17,6 +17,8 @@
 #endif
 
 typedef struct object_t {
+	struct object_t* next;
+	struct object_t* prev;
 	void* value;
 	unsigned int type;
 	unsigned int size;

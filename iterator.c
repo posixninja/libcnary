@@ -26,9 +26,12 @@ iterator_t* iterator_create(list_t* list) {
 	}
 	memset(iterator, '\0', sizeof(iterator_t));
 
+	iterator->next = iterator_next;
+	iterator->bind = iterator_bind;
+
 	if(list != NULL) {
 		// Create and bind to list
-
+		iterator->bind(iterator, list);
 	} else {
 		// Empty Iterator
 	}
@@ -37,9 +40,39 @@ iterator_t* iterator_create(list_t* list) {
 }
 
 object_t* iterator_next(iterator_t* iterator) {
-	return NULL;
+	object_t* next = NULL;
+
+	if(iterator == NULL || iterator->value == NULL) {
+		return NULL;
+	}
+
+	next = iterator->value->next;
+	iterator->value = next;
+	if(next != NULL) {
+		iterator->position++;
+	}
+	return next;
 }
 
 int iterator_bind(iterator_t* iterator, list_t* list) {
-	return -1;
+	if(iterator == NULL) {
+		return -1;
+	}
+
+	iterator->position = 0;
+	iterator->count = 0;
+	iterator->begin = NULL;
+	iterator->end = NULL;
+	iterator->value = NULL;
+	iterator->list = list;
+
+	if(list == NULL) {
+		return -1;
+	}
+
+	iterator->count = list->count;
+	iterator->begin = (object_t*) list->begin;
+	iterator->end = (object_t*) list->end;
+	iterator->value = iterator->begin;
+	return 0;
 }

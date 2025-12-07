@@ -10,7 +10,7 @@
 
 #include "object.h"
 
-#define NODE_TYPE 1;
+#define NODE_TYPE 1
 
 struct node_list_t;
 
@@ -29,6 +29,7 @@ typedef struct node_t {
 	unsigned int depth;
 	struct node_t* parent;
 	struct node_list_t* children;
+	char* key;
 
 	// Virtual Functions
 	int(*attach)(struct node_t* parent, struct node_t* child);
@@ -38,9 +39,12 @@ typedef struct node_t {
 
 void node_destroy(struct node_t* node);
 struct node_t* node_create(struct node_t* parent);
+struct node_t* node_create_with_key(struct node_t* parent, const char* key);
 
 int node_attach(struct node_t* parent, struct node_t* child);
 int node_detach(struct node_t* parent, struct node_t* child);
+
+struct node_t* node_find_child(struct node_t* parent, const char* key);
 
 void node_debug(struct node_t* node);
 

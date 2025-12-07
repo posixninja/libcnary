@@ -11,8 +11,9 @@
 #include "object.h"
 
 typedef struct list_t {
-	void* next;
-	void* prev;
+	void* begin;
+	void* end;
+	unsigned int count;
 } list_t;
 
 void list_init(struct list_t* list);
