@@ -9,6 +9,7 @@
 #define NODE_LIST_H_
 
 struct node_t;
+struct hash_map_t;
 
 // This class implements the list_t abstract class
 typedef struct node_list_t {
@@ -18,6 +19,8 @@ typedef struct node_list_t {
 
 	// node_list_t members
 	unsigned int count;
+	struct node_t* owner;
+	struct hash_map_t* lookup;
 
 } node_list_t;
 
@@ -26,5 +29,6 @@ struct node_list_t* node_list_create(struct node_t* node);
 
 int node_list_add(node_list_t* list, node_t* node);
 int node_list_remove(node_list_t* list, node_t* node);
+struct node_t* node_list_find(node_list_t* list, const char* key);
 
 #endif /* NODE_LIST_H_ */

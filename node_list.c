@@ -5,18 +5,34 @@
  *      Author: posixninja
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "list.h"
+#include "hash_map.h"
 #include "node.h"
 #include "node_list.h"
 
 void node_list_destroy(node_list_t* list) {
-	if(list != NULL) {
-		list_destroy((list_t*) list);
+	node_t* current = NULL;
+	node_t* next = NULL;
+	if(list == NULL) {
+		return;
 	}
+
+	current = list->begin;
+	while(current != NULL) {
+		next = current->next;
+		current->next = NULL;
+		current->prev = NULL;
+		current = next;
+	}
+
+	if(list->lookup != NULL) {
+		hash_map_destroy(list->lookup);
+		list->lookup = NULL;
+	}
+
+	free(list);
 }
 
 node_list_t* node_list_create(node_t* node) {
@@ -27,31 +43,98 @@ node_list_t* node_list_create(node_t* node) {
 	memset(list, '\0', sizeof(node_list_t));
 
 	// Initialize structure
-	list_init((list_t*) list);
+	list->begin = NULL;
+	list->end = NULL;
 	list->count = 0;
+	list->owner = node;
+	list->lookup = hash_map_create(32);
+	if(list->lookup == NULL) {
+		free(list);
+		return NULL;
+	}
 	return list;
 }
 
 int node_list_add(node_list_t* list, node_t* node) {
-	// Find the last element in the list
-	node_t* last = list->end;
+	node_t* last = NULL;
+	if(list == NULL || node == NULL) {
+		return -1;
+	}
 
-	// Setup our new node as the new last element
+	if(node->key != NULL && hash_map_get(list->lookup, node->key) != NULL) {
+		return -1;
+	}
+
+	last = list->end;
 	node->next = NULL;
 	node->prev = last;
 
-	// Set the next element of our old "last" element
-	last->next = node;
+	if(last != NULL) {
+		last->next = node;
+	} else {
+		list->begin = node;
+	}
 
-	// Set the lists prev to the new last element
 	list->end = node;
-
-	// Increment our node count for this list
 	list->count++;
+
+	if(node->key != NULL && hash_map_put(list->lookup, node->key, node) != 0) {
+		// Rollback on failure to index
+		list->count--;
+		list->end = node->prev;
+		if(node->prev != NULL) {
+			node->prev->next = NULL;
+		} else {
+			list->begin = NULL;
+		}
+		node->next = NULL;
+		node->prev = NULL;
+		return -1;
+	}
+
 	return 0;
 }
 
 int node_list_remove(node_list_t* list, node_t* node) {
-	return -1;
+	if(list == NULL || node == NULL) {
+		return -1;
+	}
+
+	if(node->prev != NULL) {
+		node->prev->next = node->next;
+	} else if(list->begin == node) {
+		list->begin = node->next;
+	} else {
+		return -1;
+	}
+
+	if(node->next != NULL) {
+		node->next->prev = node->prev;
+	} else if(list->end == node) {
+		list->end = node->prev;
+	} else {
+		return -1;
+	}
+
+	if(list->count > 0) {
+		list->count--;
+	}
+
+	if(node->key != NULL) {
+		hash_map_remove(list->lookup, node->key);
+	}
+
+	node->next = NULL;
+	node->prev = NULL;
+
+	return 0;
+}
+
+node_t* node_list_find(node_list_t* list, const char* key) {
+	if(list == NULL || key == NULL) {
+		return NULL;
+	}
+
+	return (node_t*) hash_map_get(list->lookup, key);
 }
 

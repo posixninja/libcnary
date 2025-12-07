@@ -46,17 +46,39 @@ node_iterator_t* node_iterator_create(node_list_t* list) {
 }
 
 node_t* node_iterator_next(node_iterator_t* iterator) {
-	node_t* next = iterator->value->next;
+	node_t* next = NULL;
+
+	if(iterator == NULL || iterator->value == NULL) {
+		return NULL;
+	}
+
+	next = iterator->value->next;
 	iterator->value = next;
-	iterator->position++;
+	if(next != NULL) {
+		iterator->position++;
+	}
 	return next;
 }
 
 int node_iterator_bind(node_iterator_t* iterator, node_list_t* list) {
+	if(iterator == NULL) {
+		return -1;
+	}
+
 	iterator->position = 0;
-	iterator->end = list->end;
+	iterator->count = 0;
+	iterator->begin = NULL;
+	iterator->end = NULL;
+	iterator->value = NULL;
+	iterator->list = list;
+
+	if(list == NULL) {
+		return -1;
+	}
+
 	iterator->count = list->count;
 	iterator->begin = list->begin;
+	iterator->end = list->end;
 	iterator->value = list->begin;
 	return 0;
 }
