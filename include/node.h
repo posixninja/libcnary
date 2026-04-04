@@ -30,6 +30,9 @@ typedef struct node_t {
 	struct node_t* parent;
 	struct node_list_t* children;
 
+	// Key for hash map lookup
+	char* key;
+
 	// Virtual Functions
 	int(*attach)(struct node_t* parent, struct node_t* child);
 	int(*detach)(struct node_t* parent, struct node_t* child);
@@ -38,9 +41,12 @@ typedef struct node_t {
 
 void node_destroy(struct node_t* node);
 struct node_t* node_create(struct node_t* parent);
+struct node_t* node_create_with_key(struct node_t* parent, const char* key);
 
 int node_attach(struct node_t* parent, struct node_t* child);
 int node_detach(struct node_t* parent, struct node_t* child);
+
+struct node_t* node_lookup(struct node_t* parent, const char* key);
 
 void node_debug(struct node_t* node);
 

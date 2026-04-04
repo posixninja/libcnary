@@ -15,6 +15,9 @@
 
 void node_list_destroy(node_list_t* list) {
 	if(list != NULL) {
+		if(list->map != NULL) {
+			hashmap_destroy(list->map);
+		}
 		list_destroy((list_t*) list);
 	}
 }
@@ -48,10 +51,28 @@ int node_list_add(node_list_t* list, node_t* node) {
 
 	// Increment our node count for this list
 	list->count++;
+
+	// Register in hash map if the node has a key
+	if(node->key != NULL) {
+		if(list->map == NULL) {
+			list->map = hashmap_create();
+		}
+		if(list->map != NULL) {
+			hashmap_set(list->map, node->key, node);
+		}
+	}
+
 	return 0;
 }
 
 int node_list_remove(node_list_t* list, node_t* node) {
 	return -1;
+}
+
+struct node_t* node_list_lookup(node_list_t* list, const char* key) {
+	if(list == NULL || key == NULL || list->map == NULL) {
+		return NULL;
+	}
+	return (node_t*) hashmap_get(list->map, key);
 }
 

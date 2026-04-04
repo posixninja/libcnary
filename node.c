@@ -14,11 +14,14 @@
 
 void node_destroy(node_t* node) {
 	if(node) {
+		if(node->key) {
+			free(node->key);
+		}
 		free(node);
 	}
 }
 
-node_t* node_create(node_t* parent) {
+node_t* node_create_with_key(node_t* parent, const char* key) {
 	int error = 0;
 
 	node_t* node = (node_t*) malloc(sizeof(node_t));
@@ -30,10 +33,19 @@ node_t* node_create(node_t* parent) {
 	node->depth = 0;
 	node->next = NULL;
 	node->prev = NULL;
+	node->key = NULL;
 	node->isLeaf = TRUE;
 	node->isRoot = TRUE;
 	node->parent = NULL;
 	node->children = node_list_create(node);
+
+	if(key != NULL) {
+		node->key = strdup(key);
+		if(node->key == NULL) {
+			node_destroy(node);
+			return NULL;
+		}
+	}
 
 	// Pass NULL to create a root node
 	if(parent != NULL) {
@@ -50,6 +62,10 @@ node_t* node_create(node_t* parent) {
 	return node;
 }
 
+node_t* node_create(node_t* parent) {
+	return node_create_with_key(parent, NULL);
+}
+
 int node_attach(node_t* parent, node_t* child) {
 	child->isLeaf = TRUE;
 	child->isRoot = FALSE;
@@ -63,6 +79,13 @@ int node_attach(node_t* parent, node_t* child) {
 
 int node_detach(node_t* parent, node_t* child) {
 	return 0;
+}
+
+node_t* node_lookup(node_t* parent, const char* key) {
+	if(parent == NULL || key == NULL) {
+		return NULL;
+	}
+	return node_list_lookup(parent->children, key);
 }
 
 void node_debug(node_t* node) {
