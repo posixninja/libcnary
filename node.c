@@ -21,7 +21,7 @@ void node_destroy(node_t* node) {
 	}
 }
 
-node_t* node_create_with_key(node_t* parent, const char* key) {
+node_t* node_create(node_t* parent, const char* key) {
 	int error = 0;
 
 	node_t* node = (node_t*) malloc(sizeof(node_t));
@@ -60,10 +60,6 @@ node_t* node_create_with_key(node_t* parent, const char* key) {
 	}
 
 	return node;
-}
-
-node_t* node_create(node_t* parent) {
-	return node_create_with_key(parent, NULL);
 }
 
 int node_attach(node_t* parent, node_t* child) {

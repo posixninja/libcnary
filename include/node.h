@@ -40,8 +40,7 @@ typedef struct node_t {
 } node_t;
 
 void node_destroy(struct node_t* node);
-struct node_t* node_create(struct node_t* parent);
-struct node_t* node_create_with_key(struct node_t* parent, const char* key);
+struct node_t* node_create(struct node_t* parent, const char* key);
 
 int node_attach(struct node_t* parent, struct node_t* child);
 int node_detach(struct node_t* parent, struct node_t* child);

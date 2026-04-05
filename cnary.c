@@ -13,23 +13,23 @@ int main(int argc, char* argv[]) {
 	node_t* found = NULL;
 
 	puts("Creating root node");
-	node_t* root = node_create(NULL);
+	node_t* root = node_create(NULL, NULL);
 
 	puts("Creating child 1 node");
-	node_t* one = node_create(root);
+	node_t* one = node_create(root, NULL);
 	puts("Creating child 2 node");
-	node_t* two = node_create(root);
+	node_t* two = node_create(root, NULL);
 
 	puts("Creating child 3 node");
-	node_t* three = node_create(one);
+	node_t* three = node_create(one, NULL);
 
 	puts("Debugging root node");
 	node_debug(root);
 
 	puts("Creating keyed child nodes");
-	node_t* alpha = node_create_with_key(root, "alpha");
-	node_t* beta  = node_create_with_key(root, "beta");
-	node_t* gamma = node_create_with_key(alpha, "gamma");
+	node_t* alpha = node_create(root, "alpha");
+	node_t* beta  = node_create(root, "beta");
+	node_t* gamma = node_create(alpha, "gamma");
 
 	puts("Looking up child nodes by key");
 	found = node_lookup(root, "alpha");
